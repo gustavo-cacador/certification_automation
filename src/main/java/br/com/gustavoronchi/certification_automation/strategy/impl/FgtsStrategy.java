@@ -87,16 +87,16 @@ public class FgtsStrategy extends AbstractCertidaoStrategy {
             log.info("Aguardando resultado da consulta...");
             seleniumHelper.aguardarVisivel(
                     driver,
-                    By.xpath("//*[contains(text(),'REGULAR perante o FGTS')]")
+                    By.partialLinkText("Certificado de Regularidade")
             );
 
             // ---------------------------------------------------
             // VERIFICA IRREGULARIDADE
             // ---------------------------------------------------
 
-            if (paginaIndicaIrregularidade(driver)) {
+            if (!possuiCrf(driver)) {
 
-                log.warn("[{}] CNPJ {} irregular no FGTS",
+                log.warn("[{}] Nenhum CRF encontrado para o CNPJ {}",
                         getPortalId(),
                         cnpj);
 
@@ -107,7 +107,7 @@ public class FgtsStrategy extends AbstractCertidaoStrategy {
                                 "CRF_FGTS",
                                 RegistroCertidao.StatusCertidao.POSITIVA,
                                 null,
-                                "Empresa irregular perante o FGTS"
+                                "CRF não disponível para o CNPJ informado"
                         )
                 );
 
@@ -199,15 +199,9 @@ public class FgtsStrategy extends AbstractCertidaoStrategy {
         return resultados;
     }
 
-    // verifica se a empresa está irregular
-    private boolean paginaIndicaIrregularidade(WebDriver driver) {
-
-        try {
-            return !driver.findElements(
-                    By.xpath("//*[contains(text(),'irregular') or contains(text(),'Irregular')]")
-            ).isEmpty();
-        } catch (Exception e) {
-            return false;
-        }
+    private boolean possuiCrf(WebDriver driver) {
+        return !driver.findElements(
+                By.partialLinkText("Certificado de Regularidade")
+        ).isEmpty();
     }
 }
