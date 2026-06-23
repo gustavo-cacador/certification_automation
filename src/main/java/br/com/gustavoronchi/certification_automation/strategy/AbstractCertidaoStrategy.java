@@ -9,10 +9,14 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.print.PrintOptions;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public abstract class AbstractCertidaoStrategy
@@ -71,5 +75,31 @@ public abstract class AbstractCertidaoStrategy
                 .dataDownload(LocalDateTime.now())
                 .mensagemErro(erro)
                 .build();
+    }
+
+    protected String renomearPdfBaixado(
+            String pasta,
+            String novoNome
+    ) throws IOException {
+
+        Path pastaPath = Paths.get(pasta);
+
+        Optional<Path> pdf = Files.list(pastaPath)
+                .filter(f -> f.toString().toLowerCase().endsWith(".pdf"))
+                .findFirst();
+
+        if (pdf.isEmpty()) {
+            return null;
+        }
+
+        Path destino = pastaPath.resolve(novoNome);
+
+        Files.move(
+                pdf.get(),
+                destino,
+                StandardCopyOption.REPLACE_EXISTING
+        );
+
+        return destino.toString();
     }
 }
