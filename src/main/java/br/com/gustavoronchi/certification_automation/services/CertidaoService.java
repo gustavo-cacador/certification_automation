@@ -21,7 +21,7 @@ public class CertidaoService {
 
     private final RegistroCertidaoRepository repository;
 
-    @Value("${certidao.download.path:./downloads}")
+    @Value("${certidao.empresas.destino}")
     private String pastaBase;
 
     @Value("${certidao.empresas.cnpjs:}")
